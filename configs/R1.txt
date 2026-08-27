@@ -1,0 +1,68 @@
+version 15.1
+no service timestamps log datetime msec
+no service timestamps debug datetime msec
+no service password-encryption
+!
+hostname R1
+!
+enable secret 5 $1$mERr$9cTjUIEqNGurQiFU.ZeCi1
+!
+ip cef
+no ipv6 cef
+!
+username R3 password 0 ciscoccna
+username ccna password 0 ciscoccna
+!
+license udi pid CISCO1941/K9 sn FTX1524P810
+!
+no ip domain-lookup
+!
+spanning-tree mode pvst
+!
+interface GigabitEthernet0/0
+ no ip address
+ duplex auto
+ speed auto
+ shutdown
+!
+interface GigabitEthernet0/1
+ no ip address
+ duplex auto
+ speed auto
+ shutdown
+!
+interface Serial0/0/0
+ ip address 10.1.1.1 255.255.255.252
+ encapsulation frame-relay
+ clock rate 2000000
+!
+interface Serial0/0/1
+ ip address 10.3.3.1 255.255.255.252
+ encapsulation ppp
+ ppp authentication chap
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+router eigrp 22
+ network 10.1.1.0 0.0.0.3
+ network 10.3.3.0 0.0.0.3
+ auto-summary
+!
+ip classless
+ip flow-export version 9
+!
+line con 0
+ exec-timeout 0 0
+ password cisco
+ logging synchronous
+!
+line aux 0
+!
+line vty 0 4
+ login
+line vty 5 15
+ login
+!
+end
