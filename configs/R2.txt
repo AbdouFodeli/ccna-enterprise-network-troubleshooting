@@ -1,0 +1,76 @@
+version 15.1
+no service timestamps log datetime msec
+no service timestamps debug datetime msec
+no service password-encryption
+!
+hostname R2
+!
+enable secret 5 $1$mERr$9cTjUIEqNGurQiFU.ZeCi1
+!
+ip cef
+no ipv6 cef
+!
+license udi pid CISCO1941/K9 sn FTX1524NHDJ
+!
+no ip domain-lookup
+!
+spanning-tree mode pvst
+!
+interface GigabitEthernet0/0
+ ip address 192.168.40.1 255.255.255.0
+ ip nat inside
+ duplex auto
+ speed auto
+!
+interface GigabitEthernet0/1
+ ip address dhcp
+ ip nat outside
+ duplex auto
+ speed auto
+!
+interface Serial0/0/0
+ ip address 10.1.1.2 255.255.255.252
+ encapsulation frame-relay
+ ip nat inside
+!
+interface Serial0/0/1
+ ip address 10.2.2.1 255.255.255.252
+ ip nat inside
+ clock rate 4000000
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+router eigrp 22
+ redistribute static
+ passive-interface GigabitEthernet0/0
+ network 10.1.1.0 0.0.0.3
+ network 10.2.2.0 0.0.0.3
+ network 192.168.40.0
+!
+ip nat inside source list NAT interface GigabitEthernet0/1 overload
+ip classless
+ip route 0.0.0.0 0.0.0.0 GigabitEthernet0/1
+!
+ip flow-export version 9
+!
+ip access-list standard NAT
+ permit 10.0.0.0 0.255.255.255
+ permit 192.168.0.0 0.0.255.255
+!
+ip access-list standard Private
+ deny 10.0.0.0 0.255.255.255
+ deny 192.168.0.0 0.0.255.255
+ permit any
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+!
+line aux 0
+!
+line vty 0 4
+ login
+!
+end
